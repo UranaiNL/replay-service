@@ -23,12 +23,6 @@ public class ReplayController {
         replayService.createReplay(replayRequest);
     }
 
-    @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public List<ReplayResponse> getAllReplays(){
-        return replayService.getAllReplays();
-    }
-
     @GetMapping("/{replayId}")
     @ResponseStatus(HttpStatus.OK)
     public ReplayResponse getReplayById(@PathVariable("replayId") String replayId) {

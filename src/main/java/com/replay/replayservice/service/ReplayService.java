@@ -40,11 +40,6 @@ public class ReplayService {
         return replay.map(this::mapToReplayResponse).orElse(null);
     }
 
-    public List<ReplayResponse> getAllReplays() {
-        List<Replay> replays = replayRepository.findAll();
-        return replays.stream().map(this::mapToReplayResponse).toList();
-    }
-
     public List<ReplayResponse> getReplaysWithUploaderId(String uploaderId) {
         List<Replay> replays = replayRepository.findAllByUploaderId(uploaderId);
         return replays.stream().map(this::mapToReplayResponse).toList();
@@ -53,14 +48,13 @@ public class ReplayService {
     public List<ReplayResponse> getReplaysWithCharactersByIds(GetReplaysWithCharactersRequest request) {
         String characterId1;
         String characterId2;
+        characterId1 = request.getCharacterIds().get(0).toString();
         switch (request.getCharacterIds().size()){
             case 1:
                 // If there is only one character requested, we want to check if it is present in P1 or P2.
-                characterId1 = request.getCharacterIds().get(0).toString();
                 characterId2 = request.getCharacterIds().get(0).toString();
                 break;
             case 2:
-                characterId1 = request.getCharacterIds().get(0).toString();
                 characterId2 = request.getCharacterIds().get(1).toString();
                 break;
             default:
@@ -83,7 +77,4 @@ public class ReplayService {
                 .views(replay.getViews())
                 .build();
     }
-
-
-
 }
