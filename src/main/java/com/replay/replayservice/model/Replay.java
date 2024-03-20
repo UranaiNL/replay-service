@@ -16,7 +16,7 @@ public class Replay {
     @Id
     private String id;
     private String uploaderId;
-    private String file_code;
+    private String fileCode;
     private String p1Username;
     private String p2Username;
     private String p1CharacterId;
