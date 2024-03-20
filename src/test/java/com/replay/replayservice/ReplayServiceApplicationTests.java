@@ -55,7 +55,7 @@ class ReplayServiceApplicationTests {
 
 	private ReplayRequest getReplayRequest() {
 		return ReplayRequest.builder()
-				.embedUrl("https://www.youtube.com/watch?v=mLW35YMzELE")
+				.uploaderId("111")
 				.p1Username("Akira")
 				.p2Username("Toriyama")
 				.p1CharacterId("1")

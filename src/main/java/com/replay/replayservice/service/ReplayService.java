@@ -8,6 +8,7 @@ import com.replay.replayservice.repository.ReplayRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +24,7 @@ public class ReplayService {
     public void createReplay(ReplayRequest replayRequest){
         Replay replay = Replay.builder()
                 .uploaderId(replayRequest.getUploaderId())
-                .embedUrl(replayRequest.getEmbedUrl())
+                //.fileCode() TODO: ADD FILE CODE WHEN DOING INTER SERVICE COMMUNICATION
                 .p1Username(replayRequest.getP1Username())
                 .p2Username(replayRequest.getP2Username())
                 .p1CharacterId(replayRequest.getP1CharacterId())
@@ -64,11 +65,17 @@ public class ReplayService {
         return replays.stream().map(this::mapToReplayResponse).toList();
     }
 
+    public String handleFileUpload(MultipartFile videoFile){
+        // Check if the uploaded file is not empty
+        // TODO: Handle inter service communication.
+        return "TODO!";
+    }
+
     private ReplayResponse mapToReplayResponse(Replay replay) {
         return ReplayResponse.builder()
                 .id(replay.getId())
                 .uploaderId(replay.getUploaderId())
-                .embedUrl(replay.getEmbedUrl())
+                .file_code(replay.getFile_code())
                 .p1Username(replay.getP1Username())
                 .p2Username(replay.getP2Username())
                 .p1CharacterId(replay.getP1CharacterId())
