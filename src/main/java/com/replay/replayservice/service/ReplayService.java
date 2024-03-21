@@ -11,8 +11,9 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
 
@@ -22,7 +23,7 @@ import java.util.*;
 public class ReplayService {
 
     private final ReplayRepository replayRepository;
-//    private final WebClient webClient;
+    private final WebClient.Builder webClientBuilder;
 
     public String createReplay(ReplayRequest replayRequest, MultipartFile videoFile) throws Exception {
         try{
@@ -76,36 +77,26 @@ public class ReplayService {
     }
 
     public String handleFileUpload(MultipartFile videoFile) throws Exception {
-        try{
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
+        try {
             MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
             requestBody.add("videoFile", videoFile.getResource());
 
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
-
-            RestTemplate restTemplate = new RestTemplate();
-
-            ResponseEntity<String> response = restTemplate.exchange(
-                    "http://localhost:8089/api/upload",
-                    HttpMethod.POST,
-                    requestEntity,
-                    String.class
-            );
-            if (response.getStatusCode() == HttpStatus.CREATED) {
-                String fileCode = response.getBody();
-                if (fileCode != null) {
-                    return fileCode;
-                }
-                throw new Exception("Upload-Service gave created status, but no file-code.");
+            ResponseEntity<String> responseEntity = webClientBuilder.build().post()
+                    .uri("http://upload-service/api/upload")
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .body(BodyInserters.fromMultipartData(requestBody))
+                    .retrieve()
+                    .toEntity(String.class)
+                    .block();
+            assert responseEntity != null;
+            if (responseEntity.getStatusCode() == HttpStatus.CREATED) {
+                return responseEntity.getBody();
+            } else {
+                throw new Exception("Video wasn't stored! Status code: " + responseEntity.getStatusCode());
             }
-            throw new Exception("Video wasn't stored!");
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
-
     }
 
     private ReplayResponse mapToReplayResponse(Replay replay) {
