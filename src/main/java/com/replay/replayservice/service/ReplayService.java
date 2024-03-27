@@ -68,29 +68,6 @@ public class ReplayService {
         return replays.stream().map(this::mapToReplayResponse).toList();
     }
 
-//    public String handleFileUpload(MultipartFile videoFile) throws Exception {
-//        try {
-//            MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
-//            requestBody.add("videoFile", videoFile.getResource());
-//
-//            ResponseEntity<String> responseEntity = webClientBuilder.build().post()
-//                    .uri("http://upload-service/api/upload")
-//                    .contentType(MediaType.MULTIPART_FORM_DATA)
-//                    .body(BodyInserters.fromMultipartData(requestBody))
-//                    .retrieve()
-//                    .toEntity(String.class)
-//                    .block();
-//            assert responseEntity != null;
-//            if (responseEntity.getStatusCode() == HttpStatus.CREATED) {
-//                return responseEntity.getBody();
-//            } else {
-//                throw new Exception("Video wasn't stored! Status code: " + responseEntity.getStatusCode());
-//            }
-//        } catch (Exception e) {
-//            throw new Exception(e.getMessage());
-//        }
-//    }
-
     private ReplayResponse mapToReplayResponse(Replay replay) {
         return ReplayResponse.builder()
                 .id(replay.getId())
