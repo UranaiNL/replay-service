@@ -19,14 +19,8 @@ public class ReplayController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createReplay(@RequestBody ReplayRequest replayRequest){
-        replayService.createReplay(replayRequest);
-    }
-
-    @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public List<ReplayResponse> getAllReplays(){
-        return replayService.getAllReplays();
+    public String createReplay(@RequestBody ReplayRequest replayRequest) throws Exception {
+        return replayService.createReplay(replayRequest);
     }
 
     @GetMapping("/{replayId}")

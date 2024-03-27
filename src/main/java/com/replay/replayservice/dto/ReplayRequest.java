@@ -11,11 +11,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReplayRequest {
     private String uploaderId;
-    private String embedUrl;
+    private String fileCode;
     private String p1Username;
     private String p2Username;
     private String p1CharacterId;
     private String p2CharacterId;
     private String gameId;
-    private Integer views;
 }

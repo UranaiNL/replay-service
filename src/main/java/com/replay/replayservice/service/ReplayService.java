@@ -9,9 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -20,29 +18,30 @@ public class ReplayService {
 
     private final ReplayRepository replayRepository;
 
-    public void createReplay(ReplayRequest replayRequest){
-        Replay replay = Replay.builder()
-                .uploaderId(replayRequest.getUploaderId())
-                .embedUrl(replayRequest.getEmbedUrl())
-                .p1Username(replayRequest.getP1Username())
-                .p2Username(replayRequest.getP2Username())
-                .p1CharacterId(replayRequest.getP1CharacterId())
-                .p2CharacterId(replayRequest.getP2CharacterId())
-                .gameId(replayRequest.getGameId())
-                .views(replayRequest.getViews())
-                .build();
-        replayRepository.save(replay);
-        log.info("Replay {} is saved", replay.getId());
+    public String createReplay(ReplayRequest replayRequest) throws Exception {
+        try{
+            Replay replay = Replay.builder()
+                    .uploaderId(replayRequest.getUploaderId())
+                    .fileCode(replayRequest.getFileCode())
+                    .p1Username(replayRequest.getP1Username())
+                    .p2Username(replayRequest.getP2Username())
+                    .p1CharacterId(replayRequest.getP1CharacterId())
+                    .p2CharacterId(replayRequest.getP2CharacterId())
+                    .gameId(replayRequest.getGameId())
+                    .views(0)
+                    .build();
+            replayRepository.save(replay);
+            log.info("Replay {} is saved", replay.getId());
+            return replay.getId();
+        }
+        catch(Exception e){
+            throw new Exception("Video upload failed:" + e.getMessage());
+        }
     }
 
     public ReplayResponse getReplayById(String replayId) {
         Optional<Replay> replay = replayRepository.findById(replayId);
         return replay.map(this::mapToReplayResponse).orElse(null);
-    }
-
-    public List<ReplayResponse> getAllReplays() {
-        List<Replay> replays = replayRepository.findAll();
-        return replays.stream().map(this::mapToReplayResponse).toList();
     }
 
     public List<ReplayResponse> getReplaysWithUploaderId(String uploaderId) {
@@ -53,14 +52,13 @@ public class ReplayService {
     public List<ReplayResponse> getReplaysWithCharactersByIds(GetReplaysWithCharactersRequest request) {
         String characterId1;
         String characterId2;
+        characterId1 = request.getCharacterIds().get(0).toString();
         switch (request.getCharacterIds().size()){
             case 1:
                 // If there is only one character requested, we want to check if it is present in P1 or P2.
-                characterId1 = request.getCharacterIds().get(0).toString();
                 characterId2 = request.getCharacterIds().get(0).toString();
                 break;
             case 2:
-                characterId1 = request.getCharacterIds().get(0).toString();
                 characterId2 = request.getCharacterIds().get(1).toString();
                 break;
             default:
@@ -70,11 +68,34 @@ public class ReplayService {
         return replays.stream().map(this::mapToReplayResponse).toList();
     }
 
+//    public String handleFileUpload(MultipartFile videoFile) throws Exception {
+//        try {
+//            MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
+//            requestBody.add("videoFile", videoFile.getResource());
+//
+//            ResponseEntity<String> responseEntity = webClientBuilder.build().post()
+//                    .uri("http://upload-service/api/upload")
+//                    .contentType(MediaType.MULTIPART_FORM_DATA)
+//                    .body(BodyInserters.fromMultipartData(requestBody))
+//                    .retrieve()
+//                    .toEntity(String.class)
+//                    .block();
+//            assert responseEntity != null;
+//            if (responseEntity.getStatusCode() == HttpStatus.CREATED) {
+//                return responseEntity.getBody();
+//            } else {
+//                throw new Exception("Video wasn't stored! Status code: " + responseEntity.getStatusCode());
+//            }
+//        } catch (Exception e) {
+//            throw new Exception(e.getMessage());
+//        }
+//    }
+
     private ReplayResponse mapToReplayResponse(Replay replay) {
         return ReplayResponse.builder()
                 .id(replay.getId())
                 .uploaderId(replay.getUploaderId())
-                .embedUrl(replay.getEmbedUrl())
+                .fileCode(replay.getFileCode())
                 .p1Username(replay.getP1Username())
                 .p2Username(replay.getP2Username())
                 .p1CharacterId(replay.getP1CharacterId())
@@ -83,7 +104,4 @@ public class ReplayService {
                 .views(replay.getViews())
                 .build();
     }
-
-
-
 }
