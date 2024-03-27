@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReplayRequest {
     private String uploaderId;
+    private String fileCode;
     private String p1Username;
     private String p2Username;
     private String p1CharacterId;

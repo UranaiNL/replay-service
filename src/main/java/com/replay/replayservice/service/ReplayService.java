@@ -7,13 +7,7 @@ import com.replay.replayservice.model.Replay;
 import com.replay.replayservice.repository.ReplayRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
 
@@ -23,14 +17,12 @@ import java.util.*;
 public class ReplayService {
 
     private final ReplayRepository replayRepository;
-    private final WebClient.Builder webClientBuilder;
 
-    public String createReplay(ReplayRequest replayRequest, MultipartFile videoFile) throws Exception {
+    public String createReplay(ReplayRequest replayRequest) throws Exception {
         try{
-            String fileCode = handleFileUpload(videoFile);
             Replay replay = Replay.builder()
                     .uploaderId(replayRequest.getUploaderId())
-                    .fileCode(fileCode)
+                    .fileCode(replayRequest.getFileCode())
                     .p1Username(replayRequest.getP1Username())
                     .p2Username(replayRequest.getP2Username())
                     .p1CharacterId(replayRequest.getP1CharacterId())
@@ -76,28 +68,28 @@ public class ReplayService {
         return replays.stream().map(this::mapToReplayResponse).toList();
     }
 
-    public String handleFileUpload(MultipartFile videoFile) throws Exception {
-        try {
-            MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
-            requestBody.add("videoFile", videoFile.getResource());
-
-            ResponseEntity<String> responseEntity = webClientBuilder.build().post()
-                    .uri("http://upload-service/api/upload")
-                    .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .body(BodyInserters.fromMultipartData(requestBody))
-                    .retrieve()
-                    .toEntity(String.class)
-                    .block();
-            assert responseEntity != null;
-            if (responseEntity.getStatusCode() == HttpStatus.CREATED) {
-                return responseEntity.getBody();
-            } else {
-                throw new Exception("Video wasn't stored! Status code: " + responseEntity.getStatusCode());
-            }
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
-    }
+//    public String handleFileUpload(MultipartFile videoFile) throws Exception {
+//        try {
+//            MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
+//            requestBody.add("videoFile", videoFile.getResource());
+//
+//            ResponseEntity<String> responseEntity = webClientBuilder.build().post()
+//                    .uri("http://upload-service/api/upload")
+//                    .contentType(MediaType.MULTIPART_FORM_DATA)
+//                    .body(BodyInserters.fromMultipartData(requestBody))
+//                    .retrieve()
+//                    .toEntity(String.class)
+//                    .block();
+//            assert responseEntity != null;
+//            if (responseEntity.getStatusCode() == HttpStatus.CREATED) {
+//                return responseEntity.getBody();
+//            } else {
+//                throw new Exception("Video wasn't stored! Status code: " + responseEntity.getStatusCode());
+//            }
+//        } catch (Exception e) {
+//            throw new Exception(e.getMessage());
+//        }
+//    }
 
     private ReplayResponse mapToReplayResponse(Replay replay) {
         return ReplayResponse.builder()
