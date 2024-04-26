@@ -18,11 +18,11 @@ public class ReplayService {
 
     private final ReplayRepository replayRepository;
 
-    public String createReplay(ReplayRequest replayRequest) throws Exception {
+    public ReplayResponse createReplay(ReplayRequest replayRequest) throws Exception {
         try{
             Replay replay = Replay.builder()
                     .uploaderId(replayRequest.getUploaderId())
-                    .fileCode(replayRequest.getFileCode())
+                    .publicUrl(replayRequest.getPublicUrl())
                     .p1Username(replayRequest.getP1Username())
                     .p2Username(replayRequest.getP2Username())
                     .p1CharacterId(replayRequest.getP1CharacterId())
@@ -32,7 +32,7 @@ public class ReplayService {
                     .build();
             replayRepository.save(replay);
             log.info("Replay {} is saved", replay.getId());
-            return replay.getId();
+            return mapToReplayResponse(replay);
         }
         catch(Exception e){
             throw new Exception("Video upload failed:" + e.getMessage());
@@ -72,7 +72,7 @@ public class ReplayService {
         return ReplayResponse.builder()
                 .id(replay.getId())
                 .uploaderId(replay.getUploaderId())
-                .fileCode(replay.getFileCode())
+                .publicUrl(replay.getPublicUrl())
                 .p1Username(replay.getP1Username())
                 .p2Username(replay.getP2Username())
                 .p1CharacterId(replay.getP1CharacterId())

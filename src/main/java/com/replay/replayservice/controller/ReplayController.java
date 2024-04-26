@@ -19,7 +19,7 @@ public class ReplayController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public String createReplay(@RequestBody ReplayRequest replayRequest) throws Exception {
+    public ReplayResponse createReplay(@RequestBody ReplayRequest replayRequest) throws Exception {
         return replayService.createReplay(replayRequest);
     }
 
