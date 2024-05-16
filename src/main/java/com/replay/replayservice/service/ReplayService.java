@@ -7,6 +7,7 @@ import com.replay.replayservice.model.Replay;
 import com.replay.replayservice.repository.ReplayRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -37,6 +38,11 @@ public class ReplayService {
         catch(Exception e){
             throw new Exception("Video upload failed:" + e.getMessage());
         }
+    }
+
+    public List<ReplayResponse> getReplayFeed(){
+        List<Replay> replays = replayRepository.findAll(PageRequest.of(0,10)).getContent();
+        return replays.stream().map(this::mapToReplayResponse).toList();
     }
 
     public ReplayResponse getReplayById(String replayId) {

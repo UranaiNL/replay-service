@@ -40,4 +40,10 @@ public class ReplayController {
     public List<ReplayResponse> getReplaysWithCharactersByIds(@RequestBody GetReplaysWithCharactersRequest request){
         return replayService.getReplaysWithCharactersByIds(request);
     }
+
+    @GetMapping("/feed")
+    @ResponseStatus(HttpStatus.OK)
+    public List<ReplayResponse> getReplayFeed(){
+        return replayService.getReplayFeed();
+    }
 }
