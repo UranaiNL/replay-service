@@ -1,10 +1,16 @@
 package com.replay.replayservice.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.replay.replayservice.config.RabbitMQConfig;
 import com.replay.replayservice.dto.GetReplaysWithCharactersRequest;
 import com.replay.replayservice.dto.ReplayRequest;
 import com.replay.replayservice.dto.ReplayResponse;
 import com.replay.replayservice.service.ReplayService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,14 +18,17 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping(value="/api/replay")
 public class ReplayController {
 
     private final ReplayService replayService;
+    private final ObjectMapper objectMapper;
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public ReplayResponse createReplay(@RequestBody ReplayRequest replayRequest) throws Exception {
+    @RabbitListener(queues = RabbitMQConfig.REPLAY_QUEUE)
+    public ReplayResponse createReplay(Message message) throws Exception {
+        ReplayRequest replayRequest = objectMapper.readValue(message.getBody(), new TypeReference<ReplayRequest>() {});
+        log.info("Received metadata request: {}", replayRequest);
         return replayService.createReplay(replayRequest);
     }
 
