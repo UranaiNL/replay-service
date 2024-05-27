@@ -41,7 +41,7 @@ jobs:
     env:
       PROJECT_ID: re-play-420511
       SERVICE: replay-service
-      PORT: 8092
+      PORT: 8082
       REGION: europe-west4
     steps:
       - name: Checkout
