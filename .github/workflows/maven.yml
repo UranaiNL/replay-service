@@ -62,7 +62,7 @@ jobs:
           cache: maven
 
       - name: Build and Push Container with Jib
-        run: mvn compile jib:build -Dimage=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}
+        run: mvn compile jib:dockerBuild -Dimage=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}
 
 #      - name: Deploy to Cloud Run
 #        id: uranai
