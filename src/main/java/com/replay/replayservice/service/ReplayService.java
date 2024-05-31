@@ -27,6 +27,8 @@ public class ReplayService {
 
     @RabbitListener(queues = RabbitMQConfig.REPLAY_QUEUE)
     public ReplayResponse createReplay(Message message) throws Exception {
+        String messageBody = new String(message.getBody());
+        log.info("Received raw message: {}", messageBody);
         ReplayRequest replayRequest = objectMapper.readValue(message.getBody(), new TypeReference<ReplayRequest>() {});
         log.info("Received metadata request: {}", replayRequest);
         try{
