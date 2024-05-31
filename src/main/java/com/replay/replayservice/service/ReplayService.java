@@ -1,5 +1,8 @@
 package com.replay.replayservice.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.replay.replayservice.config.RabbitMQConfig;
 import com.replay.replayservice.dto.GetReplaysWithCharactersRequest;
 import com.replay.replayservice.dto.ReplayRequest;
 import com.replay.replayservice.dto.ReplayResponse;
@@ -7,6 +10,8 @@ import com.replay.replayservice.model.Replay;
 import com.replay.replayservice.repository.ReplayRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +23,13 @@ import java.util.*;
 public class ReplayService {
 
     private final ReplayRepository replayRepository;
+    private final ObjectMapper objectMapper;
 
-    public ReplayResponse createReplay(ReplayRequest replayRequest) throws Exception {
+
+    @RabbitListener(queues = RabbitMQConfig.REPLAY_QUEUE)
+    public ReplayResponse createReplay(Message message) throws Exception {
+        ReplayRequest replayRequest = objectMapper.readValue(message.getBody(), new TypeReference<ReplayRequest>() {});
+        log.info("Received metadata request: {}", replayRequest);
         try{
             Replay replay = Replay.builder()
                     .uploaderId(replayRequest.getUploaderId())
