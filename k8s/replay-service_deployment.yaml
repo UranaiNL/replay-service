@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: replay-service-dep
+  labels:
+    app: replay-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: replay-service
+  template:
+    metadata:
+      labels:
+        app: replay-service
+    spec:
+      containers:
+        - name: replay-service
+          image: noahtenoever/replay-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8082
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: replay-service
+spec:
+  scaleTargetRef:
+    kind: Deployment
+    name: replay-service
+  maxReplicas: 3
+  minReplicas: 1
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: replay-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8082
+      targetPort: 8082
+  selector:
+    app: replay-service
