@@ -25,7 +25,6 @@ public class ReplayService {
     private final ReplayRepository replayRepository;
     private final ObjectMapper objectMapper;
 
-
     @RabbitListener(queues = RabbitMQConfig.REPLAY_QUEUE)
     public ReplayResponse createReplay(Message message) throws Exception {
         ReplayRequest replayRequest = objectMapper.readValue(message.getBody(), new TypeReference<ReplayRequest>() {});
