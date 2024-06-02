@@ -26,7 +26,7 @@ public class ReplayService {
     private final ObjectMapper objectMapper;
 
     @RabbitListener(queues = RabbitMQConfig.REPLAY_QUEUE)
-    public ReplayResponse createReplay(Message message) throws Exception {
+    public void createReplay(Message message) throws Exception {
         ReplayRequest replayRequest = objectMapper.readValue(message.getBody(), new TypeReference<ReplayRequest>() {});
         log.info("Received metadata request: {}", replayRequest);
         try{
@@ -42,7 +42,6 @@ public class ReplayService {
                     .build();
             replayRepository.save(replay);
             log.info("Replay {} is saved", replay.getId());
-            return mapToReplayResponse(replay);
         }
         catch(Exception e){
             throw new Exception("Video upload failed:" + e.getMessage());
