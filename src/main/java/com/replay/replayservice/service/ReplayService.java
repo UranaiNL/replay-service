@@ -70,7 +70,7 @@ public class ReplayService {
         characterId1 = request.getCharacterIds().get(0).toString();
         switch (request.getCharacterIds().size()){
             case 1:
-                // If there is only one character requested, we want to check if it is present in P1 or P2.
+                // If there is only one character requested, we want to check if it is present in P1 or P2?
                 characterId2 = request.getCharacterIds().get(0).toString();
                 break;
             case 2:
